@@ -1,13 +1,14 @@
 const express = require("express");
 const genre = require("./Route/genre");
 const morgan = require("morgan");
-const debug = require("config");
+const path = require("path");
+const config = require("config");
 
 var app = express();
 app.use(express.json());
-
-
-app.use('/',genre);
+app.use(morgan('combined'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', genre);
 
 const port = process.env.port || 3000;
 
