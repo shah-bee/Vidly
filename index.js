@@ -7,6 +7,9 @@ const config = require("config");
 var app = express();
 app.use(express.json());
 app.use(morgan('combined'));
+app.use(express.urlencoded({
+    extended: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', genre);
 
