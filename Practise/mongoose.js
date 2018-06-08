@@ -6,45 +6,78 @@ mongoose.connect("mongodb://localhost/mongoose-excercies").then(() => { console.
 
 const courseSchema = new mongoose.Schema(
     {
-        name: { type: String, required: true},
+        name: { type: String, required: true },
         author: String,
         date: { type: Date, default: Date.now },
-        tags: [String],
-        isPublished: Boolean,
-        price: Number
+        tags: {
+            type: Array,
+            validate:
+                {
+                    isAsync: true,
+                    validator: function (v,Callback) {
+                       setTimeout(() => {
+                        var result = v &&  v.length > 0;
+                        Callback(result);
+                       }, 3000); 
+                    },
+                    message: 'Á course should have atleast one tag'
+
+                }
+        },
+        isPublished: { type: Boolean },
+        price: {
+            type: Number, required: function () {
+                return this.isPublished;
+            }
+        },
+        category: {
+            type: String,
+            required: true,
+            enum: ['web', 'mobile', 'network']
+        }
     });
 
 const Course = mongoose.model('course', courseSchema);
 
-async function getCourses() {
-    try {
-        const courses = await Course.find({ isPublished: true }).
-            or([{ name: /.*by.*/i }, { price: { $gte: 15 } }])
-            .limit(10)
-            .sort({ price: -1 });
+// async function getCourses() {
+//     try {
+//         const courses = await Course.find({ isPublished: true }).
+//             or([{ name: /.*by.*/i }, { price: { $gte: 15 } }])
+//             .limit(10)
+//             .sort({ price: -1 });
 
-        console.log("Async await" + courses);
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
-
-getCourses();
-
-// async function createCourse() {
-// const newCourse = new Course({
-//     title: 'Bootstrap',
-//     author: 'Amera Firdaus',
-//     DurationInMonths: 7,
-//     price: 25
-// });
-
-// const result = await newCourse.save();
-// console.log(result);
+//         console.log("Async await" + courses);
+//     }
+//     catch (err) {
+//         console.log(err);
+//     }
 // }
 
-// createCourse();
+// getCourses();
+
+async function createCourse() {
+    try {
+        const newCourse = new Course({
+            name: 'Taher',
+            title: 'Bootstrap',
+            author: 'Amera Firdaus',
+            isPublished: true,
+            tags: [],
+            DurationInMonths: 7,
+            category: 'web',
+            price: 25
+        });
+
+        const result = await newCourse.save();
+        console.log(result);
+    }
+    catch (ex) {
+        console.log(ex.message);
+    }
+
+}
+
+createCourse();
 
 // function getCourseById() {
 //     try {

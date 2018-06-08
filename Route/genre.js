@@ -1,6 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const router = express.Router();
+const genreDB = require('../Repository/genreRepo');
 
 //Gets all genres.
 var genres = [{
@@ -42,10 +43,10 @@ router.post("/api/genres", (req, res) => {
     if (error) return res.status(400).send(error.details[0].message)
 
     var genre = {
-        id: genres.length + 1,
         name: req.body.name
     }
-    genres.push(genre);
+    genreDB.addGenre(genre);
+//    genres.push(genre);
     res.send(genre);
 });
 
@@ -64,7 +65,7 @@ router.put("/api/genres/:id", (req, res) => {
 
 // Delete Genre
 
-router.delete("/api/generes/:id", (req,res) => {
+router.delete("/api/generes/:id", (req, res) => {
 
     const genre = genres.find(c => c.id === parseInt(req.params.id));
     if (!genre) return res.status(404).send("genre was not found");
