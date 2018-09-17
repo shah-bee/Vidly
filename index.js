@@ -1,5 +1,5 @@
 const express = require("express");
-const genre = require("./Route/genre");
+const student = require("./Routes/student");
 const morgan = require("morgan");
 const path = require("path");
 const config = require("config");
@@ -22,7 +22,7 @@ app.use(express.urlencoded({
     extended: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', genre);
+app.use('/api/student', student);
 
 const port = process.env.port || 3000;
 
