@@ -1,4 +1,6 @@
 const express = require("express");
+const { auth } = require("../middleware/auth");
+const { admin } = require("../middleware/admin");
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const router = express.Router();
@@ -11,8 +13,8 @@ router.get("/", async (req, res) => {
   res.send(result);
 });
 
-router.get("/:id", (req, res) => {
-  const student = studentModel.find(req.params.id);
+router.get("/:id", async (req, res) => {
+  const student = await studentModel.findById(req.params.id);
   if (!student) res.status(404).send("student was not found");
   res.send(student);
 });
@@ -28,7 +30,8 @@ function ValidateStudent(student) {
 }
 
 // Add/Create a new student
-router.post("/", async (req, res) => {
+router.post("/", auth,
+ async (req, res) => {
   const { error, value } = ValidateStudent(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 

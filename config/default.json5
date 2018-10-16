@@ -1,5 +1,3 @@
 {
-    Default : {
-        
-    }
+  jwtPrivateKey: "student_jwtPrivateKey"
 }

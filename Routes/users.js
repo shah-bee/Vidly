@@ -1,9 +1,14 @@
-const { User, validate } = require("../models/users");
-const mongoose = require("mongoose");
+const auth = require("../middleware/auth");
+const { User, Validate } = require("../models/users");
 const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
+
+router.get("/me", auth, async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password");
+  res.send(user);
+});
 
 router.get("/", async (req, res) => {
   const result = await User.find();
@@ -17,11 +22,11 @@ router.get("/:id", async (req, res) => {
   res.send(result);
 });
 
-router.post("/", async (req, res) => {
-  const { error, value } = validate(req.body);
+router.post("/",  async (req, res) => {
+  const { error, value } = Validate(req.body);
   if (error) res.status(400).send(error.details[0].message);
 
-  let result = await User.find(_.pick(req.body, ["username", "email"]));
+  let result = await User.findOne(_.pick(req.body, ["username", "email"]));
   if (result) res.status(400).send("Already user exists.");
 
   let user = new User({
@@ -31,10 +36,13 @@ router.post("/", async (req, res) => {
   });
 
   const salt = await bcrypt.genSalt(10);
-  user.password =await bcrypt.hash(user.password, salt);
+  user.password = await bcrypt.hash(user.password, salt);
 
   await user.save();
-  res.send(user);
+
+  const token = user.generateAuthToken();
+  //jwt.verify()
+  res.header("x-auth-token", token).send(_.pick(user, ["username", "email"]));
 });
 
 module.exports = router;
