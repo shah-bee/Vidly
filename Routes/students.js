@@ -1,5 +1,5 @@
 const express = require("express");
-const { auth } = require("../middleware/auth");
+const auth = require("../middleware/auth");
 const { admin } = require("../middleware/admin");
 const mongoose = require("mongoose");
 const Joi = require("joi");
@@ -30,8 +30,7 @@ function ValidateStudent(student) {
 }
 
 // Add/Create a new student
-router.post("/", auth,
- async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { error, value } = ValidateStudent(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 

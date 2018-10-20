@@ -1,3 +1,7 @@
+
+
+
+
 const auth = require("../middleware/auth");
 const { User, Validate } = require("../models/users");
 const express = require("express");
@@ -10,7 +14,7 @@ router.get("/me", auth, async (req, res) => {
   res.send(user);
 });
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   const result = await User.find();
   if (!result) return res.status(400).send("user not found!");
   res.send(result);

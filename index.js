@@ -1,4 +1,7 @@
+const winston = require("winston");
+require("winston-mongodb");
 const express = require("express");
+require("express-async-errors");
 const students = require("./Routes/students");
 const users = require("./Routes/users");
 const auth = require("./Routes/auth");
@@ -7,9 +10,7 @@ const path = require("path");
 const config = require("config");
 var mongoose = require("mongoose");
 
-debugger;
-if(!config.get("jwtPrivateKey")){
-  debugger;
+if (!config.get("jwtPrivateKey")) {
   console.log("FATAL ERROR: Private key is not defined");
   process.exit();
 }
@@ -26,6 +27,26 @@ mongoose
   });
 
 var app = express();
+
+winston.handleExceptions(
+  new winston.transports.File({ filename: "uncaughtExceptions.log" })
+);
+
+winston.add(winston.transports.File, { filename: "combined.log" });
+
+winston.add(winston.transports.MongoDB, {
+  db: "mongodb://localhost:27017/Vidly",
+  level: "info"
+});
+
+
+/** Configuring winston */
+// const logger = createLogger({
+//   transports: [new transports.File({ filename: "combined.log" })],
+//   exceptionHandlers: [new transports.File({ filename: "error.log" })],
+//   exitOnError: false
+// });
+
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(
@@ -33,6 +54,7 @@ app.use(
     extended: true
   })
 );
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/students", students);
 app.use("/api/users", users);
