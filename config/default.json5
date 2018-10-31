@@ -1,3 +1,4 @@
 {
-  jwtPrivateKey: "student_jwtPrivateKey"
+  jwtPrivateKey: "student_jwtPrivateKey",
+  db: "mongoDB://localhost:27017/Vidly"
 }

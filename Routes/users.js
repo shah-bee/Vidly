@@ -28,10 +28,10 @@ router.get("/:id", async (req, res) => {
 
 router.post("/",  async (req, res) => {
   const { error, value } = Validate(req.body);
-  if (error) res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
 
   let result = await User.findOne(_.pick(req.body, ["username", "email"]));
-  if (result) res.status(400).send("Already user exists.");
+  if (result) return res.status(400).send("Already user exists.");
 
   let user = new User({
     username: req.body.username,
